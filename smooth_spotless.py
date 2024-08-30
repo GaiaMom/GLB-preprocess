@@ -9,7 +9,7 @@ bpy.ops.object.select_all(action='SELECT')
 bpy.ops.object.delete()
 
 # Check if file exists
-filepath = r"D:\Projects\GLB-preprocess\characters\3\final.glb"
+filepath = r"D:\Projects\GLB-preprocess\characters\1\final.glb"
 # Specify the path where you want to save the texture map
 export_path = r"./texture_map.png"
 # Path to the modified texture map
@@ -20,6 +20,9 @@ gaussian_texture_path = 'gaussian_texture_map.png'
 filtered_texture_path = 'filtered_texture_map.png'
 # Applying Non-Local Means Denoising
 denoised_texture_path = 'denoised_texture_map.png'
+
+#brightness
+brightness = 1.3
 
 if os.path.exists(filepath):
     bpy.ops.import_scene.gltf(filepath=filepath)
@@ -55,7 +58,7 @@ for obj in bpy.context.selected_objects:
                     texture_image_float = texture_image.astype(np.float32)
 
                     # Define brightness factor
-                    brightness_factor = 1.8  # Increase brightness (e.g., 1.5 for 50% brighter)
+                    brightness_factor = brightness  # Increase brightness (e.g., 1.5 for 50% brighter)
 
                     # Adjust brightness
                     bright_texture_image = cv2.convertScaleAbs(texture_image_float * brightness_factor)
@@ -68,7 +71,7 @@ for obj in bpy.context.selected_objects:
                     # filtered_image = cv2.bilateralFilter(bright_texture_image, d=9, sigmaColor=75, sigmaSpace=75)
 
                     # Apply Non-Local Means Denoising
-                    denoised_image = cv2.fastNlMeansDenoisingColored(bright_texture_image, None, h=5, hColor=10, templateWindowSize=7, searchWindowSize=21)
+                    denoised_image = cv2.fastNlMeansDenoisingColored(bright_texture_image, None, h=8, hColor=10, templateWindowSize=7, searchWindowSize=21)
 
                     # Save the modified texture map
                     cv2.imwrite(modified_texture_path, denoised_image)
