@@ -96,7 +96,7 @@ def cur_filepath(img_name):
     else:
         return img_name
         
-def texture_conv(uv_texture, brightness = 1.3):
+def texture_conv(uv_texture, mode = 1, brightness = 1.3):
     # Path to the modified texture map
     modified_texture_path = 'brightened_texture_map.png'
     labeled_texture_path =  'labeled_texture_map.png'
@@ -133,9 +133,12 @@ def texture_conv(uv_texture, brightness = 1.3):
     
     print(f'Modified texture saved to {modified_texture_path}')
     print(f'Labeled texture saved to {labeled_texture_path}')
-    return labeled_texture_path, labeled_image
+    if (mode == 1):
+        return labeled_texture_path, labeled_image
+    else:
+        return modified_texture_path, denoised_image
 
-def import_obj_change_uv_texture(filepath):
+def import_obj_change_uv_texture(filepath, mode = 1, brightness = 1.3):
     # Specify the path where you want to save the texture map
     export_texture_path = "texture_map.png"
     modified_texture_path = r""
@@ -172,7 +175,7 @@ def import_obj_change_uv_texture(filepath):
                         # Load the texture map
                         texture_image = cv2.imread(cur_filepath(export_texture_path))
                         
-                        modified_texture_path, _ = texture_conv(texture_image)
+                        modified_texture_path, _ = texture_conv(texture_image, mode, brightness)
                     else:
                         print('No image texture found on the material.')
                 else:
@@ -233,14 +236,17 @@ def import_obj_change_uv_texture(filepath):
                 print('No active object selected.')
 
 if __name__ == "__main__":
+    basepath = r"D:\Projects\GLB-preprocess\characters\4"
+
     # Check if file exists
-    filepath = r"D:\Projects\GLB-preprocess\characters\1\final.glb"
+    filepath = os.path.join(basepath, r'final.glb')
 
     #brightness
+    mode = 2 # 1: KMean, 2: Denoise
     brightness = 1.3
     
     del_existing_objs()
-    import_obj_change_uv_texture(filepath)
+    import_obj_change_uv_texture(filepath, mode, brightness)
         
     # Export the processed GLB file
-    bpy.ops.export_scene.gltf(filepath=r"D:\Projects\GLB-preprocess\characters\1\output_smoothed.glb", export_format='GLB')
+    bpy.ops.export_scene.gltf(filepath=os.path.join(basepath, f'output_smoothed_{mode}.glb'), export_format='GLB')
